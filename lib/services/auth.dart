@@ -12,6 +12,7 @@ class AuthService {
       FirebaseUser user = result.user;
       return User.fromFirebase(user);
     } catch (e) {
+      print(e);
       return null;
     }
   }
@@ -24,6 +25,7 @@ class AuthService {
       FirebaseUser user = result.user;
       return User.fromFirebase(user);
     } catch (e) {
+      print(e);
       return null;
     }
   }
@@ -32,7 +34,7 @@ class AuthService {
     await _fAuth.signOut();
   }
 
-  Stream get currentUser {
+  Stream<User> get currentUser {
     return _fAuth.onAuthStateChanged
         .map((user) => user != null ? User.fromFirebase(user) : null);
   }

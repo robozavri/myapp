@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/services/auth.dart';
 import '../domain/workout.dart';
 
 class HomePage extends StatelessWidget {
@@ -9,8 +12,16 @@ class HomePage extends StatelessWidget {
     return Container(
       child: Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
-        appBar:
-            AppBar(title: Text('MaxFit'), leading: Icon(Icons.fitness_center)),
+        appBar: AppBar(
+          title: Text('MaxFit'),
+          leading: Icon(Icons.fitness_center),
+          actions: <Widget>[
+            FlatButton.icon(
+                onPressed: () => {AuthService().logOut()},
+                icon: Icon(Icons.supervised_user_circle, color: Colors.white),
+                label: SizedBox.shrink())
+          ],
+        ),
         body: WorkoutsList(),
       ),
     );

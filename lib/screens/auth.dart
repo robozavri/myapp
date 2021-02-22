@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/domain/user.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import '../services/auth.dart';
 
 class AuthorizationPage extends StatefulWidget {
   @override
@@ -12,6 +15,8 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
   String _email;
   String _password;
   bool showLogin = true;
+
+  AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -104,48 +109,86 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
       );
     }
 
-    void _buttonAction() {
+    void _loginButtonAction() async {
       _email = _emailController.text;
       _password = _passwordController.text;
+      if (_email.isEmpty || _password.isEmpty) return;
 
-      _emailController.clear();
-      _passwordController.clear();
+      User user = await _authService.signedInWithEmailAndPassword(
+          _email.trim(), _password.trim());
+
+      if (user == null) {
+        Fluttertoast.showToast(
+            msg: "cannot sign in please check email/password",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIos: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        _emailController.clear();
+        _passwordController.clear();
+      }
+    }
+
+    void _registerButtonAction() async {
+      _email = _emailController.text;
+      _password = _passwordController.text;
+      if (_email.isEmpty || _password.isEmpty) return;
+
+      User user = await _authService.registerWithEmailAndPassword(
+          _email.trim(), _password.trim());
+
+      if (user == null) {
+        Fluttertoast.showToast(
+            msg: "cannot sign up please check email/password",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIos: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        _emailController.clear();
+        _passwordController.clear();
+      }
     }
 
     Widget _displayForm() {
       print(this.showLogin);
-      return Text('satesto');
-      // if (showLogin) {
-      //   return Column(children: <Widget>[
-      //     _form('Login', _buttonAction),
-      //     Padding(
-      //       padding: EdgeInsets.all(10),
-      //       child: GestureDetector(
-      //           child: Text('No registed yet ? Register!',
-      //               style: TextStyle(fontSize: 20, color: Colors.white)),
-      //           onTap: () {
-      //             setState(() {
-      //               showLogin = false;
-      //             });
-      //           }),
-      //     ),
-      //   ]);
-      // } else {
-      //   return Column(children: <Widget>[
-      //     _form('REGISTER', _buttonAction),
-      //     Padding(
-      //       padding: EdgeInsets.all(10),
-      //       child: GestureDetector(
-      //           child: Text('Already registred ? Login!',
-      //               style: TextStyle(fontSize: 20, color: Colors.white)),
-      //           onTap: () {
-      //             setState(() {
-      //               showLogin = true;
-      //             });
-      //           }),
-      //     ),
-      //   ]);
-      // }
+      // return Text('satesto');
+      if (showLogin) {
+        return Column(children: <Widget>[
+          _form('Login', _loginButtonAction),
+          Padding(
+            padding: EdgeInsets.all(10),
+            child: GestureDetector(
+                child: Text('No registed yet ? Register!',
+                    style: TextStyle(fontSize: 20, color: Colors.white)),
+                onTap: () {
+                  setState(() {
+                    showLogin = false;
+                  });
+                }),
+          ),
+        ]);
+      } else {
+        return Column(children: <Widget>[
+          _form('REGISTER', _registerButtonAction),
+          Padding(
+            padding: EdgeInsets.all(10),
+            child: GestureDetector(
+                child: Text('Already registred ? Login!',
+                    style: TextStyle(fontSize: 20, color: Colors.white)),
+                onTap: () {
+                  setState(() {
+                    showLogin = true;
+                  });
+                }),
+          ),
+        ]);
+      }
     }
 
     return Scaffold(
@@ -154,18 +197,19 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
         children: <Widget>[
           _logo(),
           Column(children: <Widget>[
-            _form('Login', _buttonAction),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: GestureDetector(
-                  child: Text('No registed yet ? Register!',
-                      style: TextStyle(fontSize: 20, color: Colors.white)),
-                  onTap: () {
-                    setState(() {
-                      showLogin = false;
-                    });
-                  }),
-            ),
+            // _form('Login', _loginButtonAction),
+            _displayForm(),
+            // Padding(
+            //   padding: EdgeInsets.all(10),
+            //   child: GestureDetector(
+            //       child: Text('No registed yet ? Register!',
+            //           style: TextStyle(fontSize: 20, color: Colors.white)),
+            //       onTap: () {
+            //         setState(() {
+            //           showLogin = false;
+            //         });
+            //       }),
+            // ),
           ]),
         ],
       ),
