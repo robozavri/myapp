@@ -1,132 +1,53 @@
-import 'dart:convert';
-
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/components/active-workouts.dart';
+import 'package:flutter_application_1/components/workout-list.dart';
 import 'package:flutter_application_1/services/auth.dart';
-import '../domain/workout.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({Key key}) : super(key: key);
+class HomePage extends StatefulWidget {
+  HomePage({Key key}) : super(key: key);
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int secionIndex = 0;
 
   @override
   Widget build(BuildContext context) {
+    Widget navigationBar = CurvedNavigationBar(
+      items: const <Widget>[
+        Icon(Icons.fitness_center),
+        Icon(Icons.search),
+      ],
+      index: 0,
+      height: 50,
+      color: Colors.white.withOpacity(0.5),
+      buttonBackgroundColor: Colors.white,
+      backgroundColor: Colors.white,
+      animationCurve: Curves.easeInOut,
+      animationDuration: Duration(milliseconds: 500),
+      onTap: (int index) {
+        setState(() => secionIndex = index);
+      },
+    );
     return Container(
       child: Scaffold(
-        backgroundColor: Theme.of(context).primaryColor,
-        appBar: AppBar(
-          title: Text('MaxFit'),
-          leading: Icon(Icons.fitness_center),
-          actions: <Widget>[
-            FlatButton.icon(
-                onPressed: () => {AuthService().logOut()},
-                icon: Icon(Icons.supervised_user_circle, color: Colors.white),
-                label: SizedBox.shrink())
-          ],
-        ),
-        body: WorkoutsList(),
-      ),
+          backgroundColor: Theme.of(context).primaryColor,
+          appBar: AppBar(
+            title: Text('MaxFit //' +
+                (secionIndex == 0 ? 'Active workouts' : 'Find workouts')),
+            leading: Icon(Icons.fitness_center),
+            actions: <Widget>[
+              FlatButton.icon(
+                  onPressed: () => {AuthService().logOut()},
+                  icon: Icon(Icons.supervised_user_circle, color: Colors.white),
+                  label: SizedBox.shrink())
+            ],
+          ),
+          body: secionIndex == 0 ? ActiveWorkouts() : WorkoutsList(),
+          bottomNavigationBar: navigationBar),
     );
   }
-}
-
-class WorkoutsList extends StatelessWidget {
-  // const WorkoutsList({Key key}) : super(key: key);
-
-  final workouts = <Workout>[
-    Workout(
-        author: 'niko',
-        title: 'პრესის ვარჯიში',
-        description: 'test descr1',
-        level: 'intermediate'),
-    Workout(
-        author: 'niko 2',
-        title: 'პრესის ვარჯიში 2',
-        description: 'test descr2',
-        level: 'begginer'),
-    Workout(
-        author: 'niko 3',
-        title: 'პრესის ვარჯიში 3',
-        description: 'test descr3',
-        level: 'advanced'),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Container(
-        child: ListView.builder(
-          itemCount: workouts.length,
-          itemBuilder: (context, i) {
-            return Card(
-                elevation: 2.0,
-                margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                child: Container(
-                  decoration: BoxDecoration(color: Colors.grey[800]),
-                  child: ListTile(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                      leading: Container(
-                        padding: EdgeInsets.only(right: 12),
-                        child: Icon(
-                          Icons.fitness_center,
-                          color: Theme.of(context).textTheme.headline3.color,
-                        ),
-                        decoration: BoxDecoration(
-                            border: Border(
-                                right: BorderSide(
-                                    width: 1, color: Colors.white24))),
-                      ),
-                      title: Text(
-                        workouts[i].title,
-                        style: TextStyle(
-                            color: Theme.of(context).textTheme.headline3.color),
-                      ),
-                      trailing: Icon(Icons.keyboard_arrow_right,
-                          color: Theme.of(context).textTheme.headline3.color),
-                      subtitle: subtitle(context, workouts[i])),
-                ));
-          },
-        ),
-      ),
-    );
-  }
-}
-
-Widget subtitle(BuildContext context, Workout workout) {
-  var color = Colors.grey;
-  double indicatorLevel = 0;
-
-  switch (workout.level) {
-    case 'begginer':
-      color = Colors.green;
-      indicatorLevel = 0.33;
-      break;
-    case 'intermediate':
-      color = Colors.yellow;
-      indicatorLevel = 0.66;
-      break;
-    case 'advanced':
-      color = Colors.red;
-      indicatorLevel = 1;
-      break;
-  }
-
-  return Row(
-    children: <Widget>[
-      Expanded(
-        flex: 1,
-        child: LinearProgressIndicator(
-          backgroundColor: Theme.of(context).textTheme.headline3.color,
-          value: indicatorLevel,
-          valueColor: AlwaysStoppedAnimation(color),
-        ),
-      ),
-      SizedBox(width: 10),
-      Expanded(
-        flex: 3,
-        child: Text(
-          workout.level,
-          style: TextStyle(color: Theme.of(context).textTheme.headline3.color),
-        ),
-      )
-    ],
-  );
 }
